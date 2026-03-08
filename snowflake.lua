@@ -6,53 +6,73 @@ local webhook = "https://discord.com/api/webhooks/1394325159766396979/fuN_AZlhob
 
 local collected = {}
 
-function sendWebhook()
+local function getRoot()
+    local char = player.Character
+    if not char then return nil end
+    return char:FindFirstChild("HumanoidRootPart")
+end
+
+local function sendWebhook(msg)
+
     local data = {
-        ["content"] = "❄️ Snowflake collected!"
+        ["content"] = msg
     }
 
     local body = HttpService:JSONEncode(data)
 
-    request({
-        Url = webhook,
-        Method = "POST",
-        Headers = {
-            ["Content-Type"] = "application/json"
-        },
-        Body = body
-    })
+    pcall(function()
+        request({
+            Url = webhook,
+            Method = "POST",
+            Headers = {
+                ["Content-Type"] = "application/json"
+            },
+            Body = body
+        })
+    end)
+
 end
 
-function collect(token)
-    local character = player.Character
-    if not character then return end
+local function getTokenFolder()
+    return workspace:FindFirstChild("Collectibles") or workspace:FindFirstChild("Tokens")
+end
 
-    local root = character:FindFirstChild("HumanoidRootPart")
+local function teleport(token)
+
+    local root = getRoot()
     if not root then return end
 
     root.CFrame = token.CFrame + Vector3.new(0,3,0)
+
 end
 
-while task.wait(0.5) do
-    local collectibles = workspace:FindFirstChild("Collectibles")
+while task.wait(0.2) do
 
-    if collectibles then
-        for _,v in pairs(collectibles:GetChildren()) do
+    local folder = getTokenFolder()
+    if not folder then continue end
 
-            if v.Name == "Snowflake" and not collected[v] then
+    for _,token in pairs(folder:GetChildren()) do
 
-                -- chỉ lấy khi snowflake đã gần mặt đất
-                if v.Position.Y < 20 then
+        if token:IsA("BasePart") then
 
-                    collected[v] = true
-                    collect(v)
-                    sendWebhook()
+            if token.Name:find("Snowflake") and not collected[token] then
 
-                    task.wait(2)
+                if token.Position.Y < 25 then
+
+                    collected[token] = true
+
+                    teleport(token)
+
+                    sendWebhook("❄️ Snowflake collected!")
+
+                    task.wait(1)
 
                 end
+
             end
 
         end
+
     end
+
 end
