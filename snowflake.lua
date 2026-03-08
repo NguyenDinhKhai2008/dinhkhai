@@ -10,7 +10,7 @@ local TextChatService = game:GetService("TextChatService")
 local SnowflakeId = "rbxassetid://6087969886"
 
 -- WEBHOOK
-local webhook = "PUT_YOUR_WEBHOOK_HERE"
+local webhook = "https://discord.com/api/webhooks/1394325159766396979/fuN_AZlhobPLeiciOaOvEl6EuBVknbC-IIMyn17tl0TUJP_jEr-v5fADnaM7S_BBSFU_"
 
 local blacklist = {}
 local collected = 0
